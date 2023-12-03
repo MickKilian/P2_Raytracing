@@ -1,31 +1,41 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   interval.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbourgeo <mbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/30 20:41:26 by mbourgeo          #+#    #+#             */
-/*   Updated: 2023/12/02 07:48:45 by mbourgeo         ###   ########.fr       */
+/*   Created: 2023/12/02 01:29:53 by mbourgeo          #+#    #+#             */
+/*   Updated: 2023/12/02 02:05:34 by mbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/ray_tracing.h"
 
-double	ft_min(const double n1, const double n2)
+t_interval	interval(double min, double max)
 {
-	if (n1 <= n2)
-		return n1;
-	else
-		return n2;
+	t_interval	intrvl;
+
+	intrvl.min = min;
+	intrvl.max = max;
+	return(intrvl);
 }
 
-double	deg_to_rad(double deg)
+bool	contains(t_interval intrvl, double x)
 {
-	return (deg * PI / 180.0);
+	return (intrvl.min <= x && x <= intrvl.max);
 }
 
-double	lin2gam_double(double linear)
+bool	surrounds(t_interval intrvl, double x)
 {
-	return sqrt(linear);
+	return (intrvl.min < x && x < intrvl.max);
+}
+
+double	clamp(t_interval intrvl, double x)
+{
+	if (x < intrvl.min)
+		return intrvl.min;
+	else if (x > intrvl.max)
+		return intrvl.max;
+	return x;
 }

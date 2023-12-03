@@ -6,13 +6,13 @@
 /*   By: mbourgeo <mbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/25 22:51:49 by mbourgeo          #+#    #+#             */
-/*   Updated: 2023/11/25 22:51:54 by mbourgeo         ###   ########.fr       */
+/*   Updated: 2023/11/29 19:18:18 by mbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //#include "../../includes/fractol.h"
 
-int	ft_assign_color(t_data *prm)
+int	ft_assign_color(t_rt *prm)
 {
 	if (prm->clr_md >= 1 && prm->clr_md <= 3)
 		ft_assign_color_simple(prm);
@@ -25,7 +25,7 @@ int	ft_assign_color(t_data *prm)
 	return (0);
 }
 
-int	ft_assign_color_simple(t_data *prm)
+int	ft_assign_color_simple(t_rt *prm)
 {
 	if (prm->inset)
 		prm->clr.val = 0x00000000;
@@ -54,7 +54,7 @@ int	ft_assign_color_simple(t_data *prm)
 	return (0);
 }
 
-int	ft_assign_color_setmode(t_data *prm)
+int	ft_assign_color_setmode(t_rt *prm)
 {
 	ft_get_color_set(prm);
 	if (prm->inset)
@@ -71,7 +71,7 @@ int	ft_assign_color_setmode(t_data *prm)
 	return (0);
 }
 
-int	ft_assign_color_thsv(t_data *prm)
+int	ft_assign_color_thsv(t_rt *prm)
 {
 	prm->clr.thsv[0] = 0;
 	prm->clr.thsv[1] = ft_modulo((prm->hm[0] * prm->stp_itr)
@@ -82,7 +82,7 @@ int	ft_assign_color_thsv(t_data *prm)
 	return (0);
 }
 
-int	ft_assign_color_newton(t_data *prm)
+int	ft_assign_color_newton(t_rt *prm)
 {
 	prm->clr.trgb[prm->newton_root + 1] = 255
 		* (1 - (double)prm->stp_itr / (double)prm->mx_itr);

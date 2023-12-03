@@ -6,30 +6,44 @@
 /*   By: mbourgeo <mbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/25 22:51:59 by mbourgeo          #+#    #+#             */
-/*   Updated: 2023/11/26 07:56:09 by mbourgeo         ###   ########.fr       */
+/*   Updated: 2023/12/02 07:53:05 by mbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/ray_tracing.h"
 
-int	vec2trgb(t_color *color)
+t_trgb	vec2trgb(const t_vec3 color)
 {
-	color->trgb[0] = 0;
-	color->trgb[1] = (int)(255.999 * color->vec.x);
-	color->trgb[2] = (int)(255.999 * color->vec.y);
-	color->trgb[3] = (int)(255.999 * color->vec.z);
-	return (0);
+	t_trgb	color_trgb;
+
+	color_trgb.t = 0;
+	color_trgb.r = (int)(255.999 * color.x);
+	color_trgb.g = (int)(255.999 * color.y);
+	color_trgb.b = (int)(255.999 * color.z);
+	return (color_trgb);
 }
 
-int	trgb2val(t_color *color)
+t_vec3	lin2gam_vec(const t_vec3 lin)
 {
-	color->val = (int)color->trgb[0] << 24 | (int)color->trgb[1] << 16
-		| (int)color->trgb[2] << 8 | (int)color->trgb[3];
-	return (0);
+	t_vec3	gamma;
+
+	gamma.x = lin2gam_double(lin.x);
+	gamma.y = lin2gam_double(lin.y);
+	gamma.z = lin2gam_double(lin.z);
+	return (gamma);
+}
+
+double	trgb2val(const t_trgb color)
+{
+	double	val;
+
+	val = (int)color.t << 24 | (int)color.r << 16
+		| (int)color.g << 8 | (int)color.b;
+	return (val);
 }
 
 /*
-int	val2trgb(t_color *color)
+int	val2trgb(t_vec3 *color)
 {
 	color->trgb[0] = ((color->val >> 24) & 0xFF);
 	color->trgb[1] = ((color->val >> 16) & 0xFF);
@@ -38,7 +52,7 @@ int	val2trgb(t_color *color)
 	return (0);
 }
 
-int	thsv2trgb(t_color *c)
+int	thsv2trgb(t_vec3 *c)
 {
 	double	m;
 	double	n;

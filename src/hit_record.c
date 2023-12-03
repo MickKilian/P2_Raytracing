@@ -1,19 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   color_display.c                                    :+:      :+:    :+:   */
+/*   hit_record.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbourgeo <mbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/26 07:26:39 by mbourgeo          #+#    #+#             */
-/*   Updated: 2023/12/02 04:50:09 by mbourgeo         ###   ########.fr       */
+/*   Created: 2023/12/01 19:45:23 by mbourgeo          #+#    #+#             */
+/*   Updated: 2023/12/02 04:54:13 by mbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/ray_tracing.h"
 
-void	write_color(t_vec3 pixel_color)
-{
-    // Write the translated [0,255] value of each color component.
-    printf("%d %d %d\n", (int)(255.999 * pixel_color.x), (int)(255.999 * pixel_color.y), (int)(255.999 * pixel_color.z));
+void	set_face_normal(const t_ray r, const t_vec3 outward_normal, t_hit_rec *rec) {
+	// Sets the hit record normal vector
+	//  Parameter 'outward_normal' should be a unit vector
+	
+	rec->front_face = vec3_dot(r.dir, outward_normal) < 0;
+	if (rec->front_face)
+		rec->normal = outward_normal;
+	else
+		rec->normal = vec3_scale(-1.0, outward_normal);
 }

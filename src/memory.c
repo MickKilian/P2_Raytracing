@@ -1,16 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   initialize.c                                       :+:      :+:    :+:   */
+/*   memory.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbourgeo <mbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/25 22:33:54 by mbourgeo          #+#    #+#             */
-/*   Updated: 2023/11/27 20:06:06 by mbourgeo         ###   ########.fr       */
+/*   Created: 2023/11/29 19:24:57 by mbourgeo          #+#    #+#             */
+/*   Updated: 2023/12/02 22:00:14 by mbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/ray_tracing.h"
+
+void	*ft_calloc(size_t nmemb, size_t size)
+{
+	char	*temp;
+
+	temp = malloc(nmemb * size);
+	if (!temp)
+		return (NULL);
+	ft_bzero(temp, nmemb * size);
+	return (temp);
+}
+
+//int	allocator(void *ptr, size_t size)
+//{
+//	*(void **)ptr = malloc(size);
+//	if (!*(void **)ptr)
+//		return (1);
+//	ft_bzero(*(void **)ptr, size);
+//	return (0);
+//}
 
 void	ft_bzero(void *ptr, const size_t size)
 {
@@ -28,18 +48,15 @@ void	ft_bzero(void *ptr, const size_t size)
 	}
 }
 
-int	init_data (t_data *data)
+void	free_httbls(t_httbl *httbl)
 {
-	ft_bzero(&data->image, sizeof(t_image));
-	data->win_width = 1920;
-	data->win_height = 1080;
-	data->samples_per_pixel = 500;
-	return (0);
-}
+	t_httbl	*temp;
 
-int	init_sph(t_sphere *sph, const t_point3 *center, double r)
-{
-	sph->center = *center;
-	sph->radius = r;
-	return 0;
+	temp = httbl;
+	while (httbl)
+	{
+		httbl = httbl->next;
+		free(temp);
+		temp = httbl;
+	}
 }

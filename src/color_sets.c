@@ -6,13 +6,13 @@
 /*   By: mbourgeo <mbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/25 22:51:38 by mbourgeo          #+#    #+#             */
-/*   Updated: 2023/11/25 22:51:43 by mbourgeo         ###   ########.fr       */
+/*   Updated: 2023/11/29 19:43:50 by mbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //#include "../../includes/fractol.h"
 
-int	ft_get_color_set(t_data *prm)
+int	ft_get_color_set(t_rt *prm)
 {
 	if (prm->clr_md == 4)
 		ft_set_clr_md_4(prm);
@@ -23,7 +23,7 @@ int	ft_get_color_set(t_data *prm)
 	return (0);
 }
 
-int	ft_set_clr_md_4(t_data *prm)
+int	ft_set_clr_md_4(t_rt *prm)
 {
 	prm->clr_sch[0] = 5;
 	prm->clr_sch[1] = 0x00000000;
@@ -39,7 +39,7 @@ int	ft_set_clr_md_4(t_data *prm)
 	return (0);
 }
 
-int	ft_set_clr_md_5(t_data *prm)
+int	ft_set_clr_md_5(t_rt *prm)
 {
 	prm->clr_sch[0] = 7;
 	prm->clr_sch[1] = 0x00000000;
@@ -55,7 +55,7 @@ int	ft_set_clr_md_5(t_data *prm)
 	return (0);
 }
 
-int	ft_set_clr_md_6(t_data *prm)
+int	ft_set_clr_md_6(t_rt *prm)
 {
 	prm->clr_sch[0] = 5;
 	prm->clr_sch[1] = 0x002E2E41;
