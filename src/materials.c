@@ -1,33 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   httbl_cylinder.c                                   :+:      :+:    :+:   */
+/*   materials.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbourgeo <mbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/29 20:08:45 by mbourgeo          #+#    #+#             */
-/*   Updated: 2023/12/04 06:32:40 by mbourgeo         ###   ########.fr       */
+/*   Created: 2023/12/04 05:34:23 by mbourgeo          #+#    #+#             */
+/*   Updated: 2023/12/04 06:02:50 by mbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/ray_tracing.h"
 
-t_cylinder	cylinder(const t_vec3 base_center, t_vec3 generator, double radius, double height)
+t_material	mat_lamber(t_lamber lamber)
 {
-	t_cylinder	cyl;
+	t_material	mat;
 
-	cyl.base_center = base_center;
-	cyl.generator = generator;
-	cyl.radius = radius;
-	cyl.height = height;
-	return (cyl);
+	mat.type = LAMBERTIAN;
+	mat.lamber = lamber;
+	return (mat);
 }
 
-bool	hit_cylinder(const t_rt *rt, const t_ray r, const t_interval tray, t_hit_rec *rec)
+t_material	mat_metal(t_metal metal)
 {
-	(void)rt;
-	(void)r;
-	(void)tray;
-	(void)rec;
-	return 1;
+	t_material	mat;
+
+	mat.type = METAL;
+	mat.metal = metal;
+	return (mat);
+}
+
+t_material	mat_dielec(t_dielec dielec)
+{
+	t_material	mat;
+
+	mat.type = DIELECTRIC;
+	mat.dielec = dielec;
+	return (mat);
 }

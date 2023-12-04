@@ -6,7 +6,7 @@
 /*   By: mbourgeo <mbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/25 22:39:34 by mbourgeo          #+#    #+#             */
-/*   Updated: 2023/12/03 07:43:03 by mbourgeo         ###   ########.fr       */
+/*   Updated: 2023/12/03 22:26:09 by mbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,11 +46,10 @@ int	ray_tracing(int argc, char **argv) {
 
 	// Show image
 	image_update(&rt.mlx);
-	mlx_loop(&rt.mlx.ptr);
+	mlx_loop(rt.mlx.ptr);
 
-	sleep(1000);
 	// Free world
-	free_httbls(rt.world.httbl);
+	free_httbls(rt.world.httbl_head);
 	
 	return 0;
 }

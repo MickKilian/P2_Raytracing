@@ -6,13 +6,13 @@
 /*   By: mbourgeo <mbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 20:08:45 by mbourgeo          #+#    #+#             */
-/*   Updated: 2023/12/03 06:34:26 by mbourgeo         ###   ########.fr       */
+/*   Updated: 2023/12/04 06:49:24 by mbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/ray_tracing.h"
 
-t_sphere	new_sphere(const t_vec3 center, double r)
+t_sphere	sphere(const t_vec3 center, double r)
 {
 	t_sphere	sph;
 
@@ -34,18 +34,24 @@ bool	hit_sphere(const t_rt *rt, const t_ray r, const t_interval tray, t_hit_rec 
 	// We simply the quadratic equation noticing that we can devide
 	// everything by a factor 2 and that a dot product of a vector
 	// with itself is the length squared of that vector
-	oc = vec3_substract2(r.orig, rt->world.httbl->sph.center);
+	oc = vec3_substract2(r.orig, rt->world.httbl->geom.sph.center);
 	half_poly.a = vec3_length_squared(r.dir);
 	half_poly.half_b = vec3_dot(oc, r.dir);
-	half_poly.c = vec3_length_squared(oc) - (rt->world.httbl->sph.radius * rt->world.httbl->sph.radius);
+	half_poly.c = vec3_length_squared(oc) - (rt->world.httbl->geom.sph.radius * rt->world.httbl->geom.sph.radius);
 
 	if (!search_poly_root(&half_poly, tray, &root))
 		return 0;
 	rec->t = root;
 	rec->p = hit_point(r, rec->t);
 	// CHECK THIS
-	rec->mat = rt->world.httbl->mat;
-	rec->color = rt->world.httbl->color;
-	set_face_normal(r, vec3_scale(1 / rt->world.httbl->sph.radius, vec3_substract2(rec->p, rt->world.httbl->sph.center)), rec);
+	rec->mat = rt->world.httbl->mat.type;
+	if (rec->mat == LAMBERTIAN)
+		rec->lamber = rt->world.httbl->mat.lamber;
+	if (rec->mat == METAL)
+		rec->metal = rt->world.httbl->mat.metal;
+	if (rec->mat == DIELECTRIC)
+		rec->dielec = rt->world.httbl->mat.dielec;
+	//rec->color = rt->world.httbl->mat.albedo;
+	set_face_normal(r, vec3_scale(1 / rt->world.httbl->geom.sph.radius, vec3_substract2(rec->p, rt->world.httbl->geom.sph.center)), rec);
 	return 1;
 }

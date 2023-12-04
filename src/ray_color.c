@@ -6,7 +6,7 @@
 /*   By: mbourgeo <mbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 02:50:35 by mbourgeo          #+#    #+#             */
-/*   Updated: 2023/12/03 07:09:47 by mbourgeo         ###   ########.fr       */
+/*   Updated: 2023/12/04 06:44:57 by mbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ t_vec3	ray_color(t_rt *rt, int depth, const t_ray r)
 			lambertian_scatter(r, rec, &attenuation, &scattered);
 		else if (rec.mat == METAL)
 			metal_scatter(r, rec, &attenuation, &scattered);
+		else if (rec.mat == DIELECTRIC)
+			dielectric_scatter(r, rec, &attenuation, &scattered);
 		//scattered_direction = vec3_add2(rec.normal, random_unit_vector());
 		//// Catch degenerate scatter direction
 		//if (near_zero(scattered_direction))

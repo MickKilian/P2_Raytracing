@@ -6,7 +6,7 @@
 /*   By: mbourgeo <mbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 02:32:41 by mbourgeo          #+#    #+#             */
-/*   Updated: 2023/12/03 03:50:34 by mbourgeo         ###   ########.fr       */
+/*   Updated: 2023/12/04 02:32:34 by mbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,4 +69,14 @@ t_vec3	random_in_same_hemisphere(const t_vec3 normal)
 		return (vec_on_unit_sphere);
 	else
 		return (vec3_scale(-1.0, vec_on_unit_sphere));
+}
+
+t_vec3	random_in_unit_disk(void)
+{
+    while (true) {
+		t_vec3	p;
+        p = new_vec3(random_double(-1, 1), random_double(-1, 1), 0);
+        if (vec3_length_squared(p) < 1)
+            return p;
+    }
 }

@@ -6,7 +6,7 @@
 /*   By: mbourgeo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/02 18:08:04 by mbourgeo          #+#    #+#             */
-/*   Updated: 2023/12/03 07:38:42 by mbourgeo         ###   ########.fr       */
+/*   Updated: 2023/12/04 07:04:49 by mbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,20 +26,21 @@
 # define	PI	3.1415926535897932385
 // Aspect ratio : 16/9
 # define	ASPECT_RATIO 1.777777778
-# define	IMAGE_WIDTH 1920
+# define	IMAGE_WIDTH 1200
 
 typedef	struct s_httbl	t_httbl;
 
-typedef enum	e_httbl_types {
+typedef enum	e_geom_types {
 	PLANE,
 	SPHERE,
 	CYLINDER,
 	LEN_HTTBL_TYPES
-}	t_httbl_types;
+}	t_geom_types;
 
 typedef enum	e_mat_types {
 	LAMBERTIAN,
 	METAL,
+	DIELECTRIC,
 	LEN_MAT_TAYPES
 }	t_mat_types;
 
@@ -108,26 +109,63 @@ typedef struct	s_cylinder
 	double	height;
 }	t_cylinder;
 
-typedef struct	s_httbl {
-	t_httbl_types	type;
-	t_mat_types		mat;
-	t_vec3			color;
-	t_httbl			*next;
+typedef struct	s_lamber
+{
+	t_vec3	albedo;
+}	t_lamber;
+
+typedef struct	s_metal
+{
+	t_vec3	albedo;
+	double	fuzz;
+}	t_metal;
+
+typedef struct	s_dielec
+{
+	t_vec3	albedo;
+	double	idx_refract;
+}	t_dielec;
+
+typedef struct	s_material
+{
+	t_mat_types		type;
+	union
+	{
+		t_lamber	lamber;
+		t_metal		metal;
+		t_dielec	dielec;
+	};
+} t_material;
+
+typedef struct	s_geometry
+{
+	t_geom_types	type;
 	union
 	{
 		t_plane		pln;
 		t_sphere	sph;
 		t_cylinder	cyl;
 	};
+} t_geometry;
+
+typedef struct	s_httbl {
+	t_geometry	geom;
+	t_material	mat;
+	t_httbl		*next;
 }	t_httbl;
 
 typedef struct	s_hit_rec {
-	t_vec3		p;
-	t_vec3		normal;
-	double		t;
-	bool		front_face;
-	t_mat_types	mat;
-	t_vec3		color;
+	t_vec3			p;
+	t_vec3			normal;
+	double			t;
+	bool			front_face;
+	t_mat_types		mat;
+	union
+	{
+		t_lamber	lamber;
+		t_metal		metal;
+		t_dielec	dielec;
+	};
 }	t_hit_rec;
 
 typedef struct	s_image {
@@ -140,7 +178,15 @@ typedef struct	s_image {
 
 typedef struct	s_camera {
 	t_vec3	center;
-	double	focal_length;
+	//double	focal_length;
+	double	vfov;
+	t_vec3	u;
+	t_vec3	v;
+	t_vec3	w;
+	double	defocus_angle;
+	double	focus_dist;
+	t_vec3	defocus_disk_u;
+	t_vec3	defocus_disk_v;
 	t_vec3	pixel00_loc;
 	t_vec3	pixel_delta_u;
 	t_vec3	pixel_delta_v;
@@ -248,6 +294,11 @@ t_vec3		ray_color_red();
 t_vec3		hit_point(const t_ray r, double t);
 t_ray		new_ray(const t_vec3 orig, const t_vec3 dir);
 t_vec3		reflect(const t_vec3 v, const t_vec3 n);
+t_vec3		refract(const t_vec3 r_in, const t_vec3 n, double eta_in_over_out);
+double		reflectance(double cosine, double ref_idx);
+t_ray		get_ray(const t_camera *cam, int i, int j);
+t_vec3		pixel_sample_square(const t_camera *cam);
+t_vec3		defocus_disk_sample(const t_camera *cam);
 
 //random.c
 t_vec3		get_random_dev(const t_camera *cam);
@@ -257,6 +308,7 @@ t_vec3		random_vec3_interval(double min, double max);
 t_vec3		random_in_unit_sphere(void);
 t_vec3		random_unit_vector(void);
 t_vec3		random_in_same_hemisphere(const t_vec3 normal);
+t_vec3		random_in_unit_disk(void);
 
 //world.c
 int			world_initialize(t_world *world);
@@ -264,20 +316,23 @@ bool		world_hit(t_rt *rt, const t_ray r, t_interval tray, t_hit_rec *rec);
 void		httbl_addback(t_world *world, t_httbl *new_httbl);
 
 //httbl_create.c
-t_httbl		*new_httbl_plane(t_plane pln, t_mat_types mat, t_vec3 color);
-t_httbl		*new_httbl_sphere(t_sphere sph, t_mat_types mat, t_vec3 color);
-t_httbl		*new_httbl_cylinder(t_cylinder cyl, t_mat_types mat, t_vec3 color);
+t_httbl		*new_httbl(const t_geometry geom, const t_material mat);
+//t_httbl		*new_httbl_plane(t_plane pln);
+//t_httbl		*new_httbl_sphere(t_sphere sph);
+//t_httbl		*new_httbl_cylinder(t_cylinder cyl);
+//void		assign_geom(t_httbl *httbl, t_httbl_types geom_type, void(*p1));
+//void		assign_mat(t_httbl *httbl, t_mat_types mat_type, void(*p2));
 
 //httbl_plane.c
-t_plane		new_plane(const t_vec3 point, t_vec3 vec1, t_vec3 vec2);
+t_plane		plane(const t_vec3 point, t_vec3 vec1, t_vec3 vec2);
 bool		hit_plane(const t_rt *rt, const t_ray r, const t_interval tray, t_hit_rec *rec);
 
 //httbl_sphere.c
-t_sphere	new_sphere(const t_vec3 center, double r);
+t_sphere	sphere(const t_vec3 center, double r);
 bool		hit_sphere(const t_rt *rt, const t_ray r, const t_interval tray, t_hit_rec *rec);
 
 //httbl_cylinder.c
-t_cylinder	new_cylinder(const t_vec3 base_center, t_vec3 generator, double radius, double height);
+t_cylinder	cylinder(const t_vec3 base_center, t_vec3 generator, double radius, double height);
 bool		hit_cylinder(const t_rt *rt, const t_ray r, const t_interval tray, t_hit_rec *rec);
 
 //utils.c
@@ -301,5 +356,25 @@ void		set_face_normal(const t_ray r, const t_vec3 outward_normal, t_hit_rec *rec
 //material_scatter.c
 bool		lambertian_scatter(const t_ray r_in, const t_hit_rec rec, t_vec3 *attenuation, t_ray *scattered);
 bool		metal_scatter(const t_ray r_in, const t_hit_rec rec, t_vec3 *attenuation, t_ray *scattered);
+bool		dielectric_scatter(const t_ray r_in, const t_hit_rec rec, t_vec3 *attenuation, t_ray *scattered);
+
+//mat_lambertian.c
+t_lamber	lamber(t_vec3 color);
+
+//mat_metal.c
+t_metal		metal(t_vec3 color, double fuzz);
+
+//mat_dielectric.c
+t_dielec	dielec(t_vec3 color, double ir);
+
+//geometries.c
+t_geometry	geom_plane(t_plane pln);
+t_geometry	geom_sphere(t_sphere sph);
+t_geometry	geom_cylinder(t_cylinder cyl);
+
+//material.c
+t_material	mat_lamber(t_lamber lamber);
+t_material	mat_metal(t_metal metal);
+t_material	mat_dielec(t_dielec dielec);
 
 #endif // RAY_TRACING

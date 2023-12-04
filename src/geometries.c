@@ -1,33 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   httbl_cylinder.c                                   :+:      :+:    :+:   */
+/*   geometries.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbourgeo <mbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/29 20:08:45 by mbourgeo          #+#    #+#             */
-/*   Updated: 2023/12/04 06:32:40 by mbourgeo         ###   ########.fr       */
+/*   Created: 2023/12/04 05:39:27 by mbourgeo          #+#    #+#             */
+/*   Updated: 2023/12/04 06:02:24 by mbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/ray_tracing.h"
 
-t_cylinder	cylinder(const t_vec3 base_center, t_vec3 generator, double radius, double height)
+t_geometry	geom_plane(t_plane pln)
 {
-	t_cylinder	cyl;
+	t_geometry	geom;
 
-	cyl.base_center = base_center;
-	cyl.generator = generator;
-	cyl.radius = radius;
-	cyl.height = height;
-	return (cyl);
+	geom.type = PLANE;
+	geom.pln = pln;
+	return (geom);
 }
 
-bool	hit_cylinder(const t_rt *rt, const t_ray r, const t_interval tray, t_hit_rec *rec)
+t_geometry	geom_sphere(t_sphere sph)
 {
-	(void)rt;
-	(void)r;
-	(void)tray;
-	(void)rec;
-	return 1;
+	t_geometry	geom;
+
+	geom.type = SPHERE;
+	geom.sph = sph;
+	return (geom);
+}
+
+t_geometry	geom_cylinder(t_cylinder cyl)
+{
+	t_geometry	geom;
+
+	geom.type = CYLINDER;
+	geom.cyl = cyl;
+	return (geom);
 }

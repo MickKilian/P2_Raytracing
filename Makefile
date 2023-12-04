@@ -6,7 +6,7 @@
 #    By: mbourgeo <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/07/06 18:34:29 by mbourgeo          #+#    #+#              #
-#    Updated: 2023/12/03 04:24:10 by mbourgeo         ###   ########.fr        #
+#    Updated: 2023/12/04 06:01:49 by mbourgeo         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,8 @@ PRIM_SRCS	=	main.c ray_tracing.c rt_initialize.c mlx.c \
 				ray_compute.c hit_record.c httbl_create.c interval.c \
 				world.c random.c ray_color.c search_poly_root.c \
 				httbl_plane.c httbl_sphere.c httbl_cylinder.c camera.c \
-				material_scatter.c
+				material_scatter.c geometries.c materials.c \
+				mat_dielectric.c mat_lambertian.c mat_metal.c
 PRIM_SRCDIR	=	src
 PRIM_PATH	=	$(addprefix $(PRIM_SRCDIR)/, $(PRIM_SRCS))
 PRIM_OBJDIR	=	obj

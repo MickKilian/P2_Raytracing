@@ -6,7 +6,7 @@
 /*   By: mbourgeo <mbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/30 18:54:17 by mbourgeo          #+#    #+#             */
-/*   Updated: 2023/12/03 07:28:46 by mbourgeo         ###   ########.fr       */
+/*   Updated: 2023/12/04 07:47:28 by mbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,44 +19,66 @@ void	cam_initialize(t_camera *cam, int img_width, int img_height)
 	t_vec3	viewport_u;
 	t_vec3	viewport_v;
 	t_vec3	viewport_upper_left;
+	double	theta;
+	t_vec3	look_from;
+	t_vec3	look_at;
+	t_vec3	vup;
+	double	defocus_radius;
 
-	cam->samples_per_pixel = 100;
+	cam->samples_per_pixel = 50;
 	cam->max_depth = 50;
+	cam->vfov = 20;  // Vertical view angle (field of view)
+
+	cam->defocus_angle = 0;  // Variation angle of rays through each pixel
+    cam->focus_dist = 1;    // Distance from camera lookfrom point to plane of perfect focus
 
 	// Camera position
-	cam->center = new_vec3(0.0, 0.0, 0.0);
+	look_from = new_vec3(13.0, 2.0, 3.0);	// Point camera is looking from
+    look_at = new_vec3(0.0, 0.0, 0.0);		// Point camera is looking at
+    vup = new_vec3(0.0, 1.0, 0.0);			// Camera-relative "up" direction
+	cam->center = look_from;
 
 	// Viewport dimensions
 	// Viewport widths less than one are ok since they are real valued.
 	// We want viewport proportions to exactly match our image proportions
-	cam->focal_length = 1.0;
-	viewport_height = 2.0;
+	// cam->focal_length = vec3_length(vec3_substract2(look_from, look_at));
+	theta = deg_to_rad(cam->vfov);
+    viewport_height = 2.0 * tan(theta / 2.0) * cam->focus_dist;
 	viewport_width = viewport_height * ((double)img_width / (double)img_height);
 
+	// Calculate the u,v,w unit basis vectors for the camera coordinate frame.
+	cam->w = vec3_unit(vec3_substract2(look_from, look_at));
+	cam->u = vec3_unit(vec3_cross(vup, cam->w));
+	cam->v = vec3_cross(cam->w, cam->u);
+
 	// Calculate the vectors across the horizontal and down the vertical viewport edges.
-	viewport_u = new_vec3(viewport_width, 0, 0);
-	viewport_v = new_vec3(0, -viewport_height, 0);
+	viewport_u = vec3_scale(viewport_width, cam->u);		// Vector across viewport horizontal edge
+	viewport_v = vec3_scale(-viewport_height, cam->v);	// Vector down viewport vertical edgw
 
 	// Calculate the horizontal and vertical delta vectors from pixel to pixel.
 	cam->pixel_delta_u = vec3_scale(1.0 / img_width, viewport_u);
 	cam->pixel_delta_v = vec3_scale(1.0 / img_height, viewport_v);
 
 	// Calculate the location of the upper left pixel.
+	// viewport_upper_left = center - (focal_length * w) - viewport_u/2 - viewport_v/2;
 	viewport_upper_left = vec3_add3(
-			vec3_add2(cam->center, vec3_scale(-1.0, new_vec3(0, 0, cam->focal_length))),
+			vec3_add2(cam->center, vec3_scale(-cam->focus_dist, cam->w)),
 			vec3_scale(-0.5, viewport_u),
 			vec3_scale(-0.5, viewport_v));
 	cam->pixel00_loc = vec3_add3(
 			viewport_upper_left,
 			vec3_scale(0.5, cam->pixel_delta_u),
 			vec3_scale(0.5, cam->pixel_delta_v));
+
+	// Calculate the camera defocus disk basis vectors.
+	defocus_radius = cam->focus_dist * tan(deg_to_rad(cam->defocus_angle / 2));
+	cam->defocus_disk_u = vec3_scale(defocus_radius, cam->u);
+	cam->defocus_disk_v = vec3_scale(defocus_radius, cam->v);
 }
 
 int	render(t_rt *rt)
 {
 	t_vec3	pixel_color;
-	t_vec3	pixel_center;
-	t_vec3	ray_direction;
 
 	// Intialization of pixel_color
 	ft_bzero(&pixel_color, sizeof(t_vec3));
@@ -72,16 +94,8 @@ int	render(t_rt *rt)
 			pixel_color = new_vec3(0, 0, 0);
 			for (int k = 0; k < rt->cam.samples_per_pixel; ++k)
 			{
-				// We add a small deviation for sampling
-				pixel_center = vec3_add2(
-								rt->cam.pixel00_loc,
-								vec3_add2(
-									vec3_add2(	vec3_scale(1.0 * i, rt->cam.pixel_delta_u),
-												vec3_scale(1.0 * j, rt->cam.pixel_delta_v)),
-									get_random_dev(&rt->cam)));
-				ray_direction = vec3_substract2(pixel_center, rt->cam.center);
 				pixel_color = vec3_add2(pixel_color,
-						ray_color(rt, rt->cam.max_depth, new_ray(rt->cam.center, ray_direction)));
+						ray_color(rt, rt->cam.max_depth, get_ray(&rt->cam ,i , j)));
 			}
 			pixel_color = vec3_scale(1.0 / (double)rt->cam.samples_per_pixel, pixel_color);
 			// We apply the gamme correction to the image
